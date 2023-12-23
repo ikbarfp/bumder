@@ -6,6 +6,8 @@ import (
 	_authRepo "github.com/ikbarfp/bumder/internal/auth/repository"
 	_authService "github.com/ikbarfp/bumder/internal/auth/service"
 	_feedsHandler "github.com/ikbarfp/bumder/internal/feeds/handler"
+	_feedsRepo "github.com/ikbarfp/bumder/internal/feeds/repository"
+	_feedsService "github.com/ikbarfp/bumder/internal/feeds/service"
 	_userHandler "github.com/ikbarfp/bumder/internal/user/handler"
 	_userRepo "github.com/ikbarfp/bumder/internal/user/repository"
 	_userService "github.com/ikbarfp/bumder/internal/user/service"
@@ -34,13 +36,14 @@ func (s *Server) initRoutes() {
 	userV1.Methods(http.MethodPost).Path("/register").HandlerFunc(userHandler.Register)
 	userV1.Methods(http.MethodGet).Path("/profile").HandlerFunc(userHandler.Profile)
 
-	feedsHandler := _feedsHandler.NewHttp()
+	feedsRepo := _feedsRepo.New()
+	feedsService := _feedsService.New(feedsRepo)
+	feedsHandler := _feedsHandler.NewHttp(feedsService)
 
 	feedsV1 := apiV1.PathPrefix("/feeds").Subrouter()
 	feedsV1.Methods(http.MethodGet).Path("/unseen").HandlerFunc(feedsHandler.Unseen)
 	feedsV1.Methods(http.MethodPost).Path("/like").HandlerFunc(feedsHandler.Like)
 	feedsV1.Methods(http.MethodPost).Path("/pass").HandlerFunc(feedsHandler.Pass)
-	feedsV1.Methods(http.MethodPost).Path("/premium").HandlerFunc(feedsHandler.Premium)
 }
 
 func (s *Server) healthcheckHandler(w http.ResponseWriter, req *http.Request) {

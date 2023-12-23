@@ -3,15 +3,14 @@ package feeds
 import "context"
 
 type (
-	// Usecase . . .
-	Usecase interface {
+	Service interface {
+		Unseen(ctx context.Context) ([]*UnseenUser, error)
 		SwipeRight(ctx context.Context, userID int, likedUserID int) error
 		SwipeLeft(ctx context.Context, userID int, dislikedUserID int) error
 	}
 
-	// Repository . . .
 	Repository interface {
-		IncrementLikeByID(ctx context.Context, userID int, likedUserID int) error
-		IncrementDislikeByID(ctx context.Context, userID int, dislikedUserID int) error
+		IncrementLikeByUserID(ctx context.Context, userID int, likedUserID int) error
+		IncrementPassByUserID(ctx context.Context, userID int, dislikedUserID int) error
 	}
 )
