@@ -35,8 +35,8 @@ func (h HttpHandler) Register(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := h.userService.Register(req.Context(), body); err != nil {
-		res.Message = "bad request"
-		res.Errors = err.Error()
+		res.Message = err.Error()
+		res.Errors = "bad request"
 		byteRes, _ := json.Marshal(res)
 
 		w.WriteHeader(http.StatusBadRequest)
