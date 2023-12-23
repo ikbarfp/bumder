@@ -3,8 +3,12 @@ package app
 import (
 	"encoding/json"
 	_authHandler "github.com/ikbarfp/bumder/internal/auth/handler"
+	_authRepo "github.com/ikbarfp/bumder/internal/auth/repository"
+	_authService "github.com/ikbarfp/bumder/internal/auth/service"
 	_feedsHandler "github.com/ikbarfp/bumder/internal/feeds/handler"
 	_userHandler "github.com/ikbarfp/bumder/internal/user/handler"
+	_userRepo "github.com/ikbarfp/bumder/internal/user/repository"
+	_userService "github.com/ikbarfp/bumder/internal/user/service"
 	"github.com/ikbarfp/bumder/pkg/response"
 	"net/http"
 )
@@ -15,17 +19,24 @@ func (s *Server) initRoutes() {
 
 	apiV1 := s.router.PathPrefix("/api/v1").Subrouter()
 
+	authRepo := _authRepo.New()
+	authService := _authService.New(authRepo)
+	authHandler := _authHandler.NewHttp(authService)
+
 	authV1 := apiV1.PathPrefix("/auth").Subrouter()
-	authHandler := _authHandler.NewHttpHandler()
 	authV1.Methods(http.MethodPost).Path("/login").HandlerFunc(authHandler.Login)
 
+	userRepo := _userRepo.New()
+	userService := _userService.New(userRepo, authRepo)
+	userHandler := _userHandler.NewHttp(userService)
+
 	userV1 := apiV1.PathPrefix("/user").Subrouter()
-	userHandler := _userHandler.NewHttpHandler()
 	userV1.Methods(http.MethodPost).Path("/register").HandlerFunc(userHandler.Register)
 	userV1.Methods(http.MethodGet).Path("/profile").HandlerFunc(userHandler.Profile)
 
+	feedsHandler := _feedsHandler.NewHttp()
+
 	feedsV1 := apiV1.PathPrefix("/feeds").Subrouter()
-	feedsHandler := _feedsHandler.NewHttpHandler()
 	feedsV1.Methods(http.MethodGet).Path("/unseen").HandlerFunc(feedsHandler.Unseen)
 	feedsV1.Methods(http.MethodPost).Path("/like").HandlerFunc(feedsHandler.Like)
 	feedsV1.Methods(http.MethodPost).Path("/pass").HandlerFunc(feedsHandler.Pass)
