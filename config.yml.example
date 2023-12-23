@@ -1,0 +1,4 @@
+server_app:
+  host: ""
+  port: ""
+  version: ""
