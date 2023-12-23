@@ -2,3 +2,6 @@ server_app:
   host: ""
   port: ""
   version: ""
+
+limit:
+    daily_credit: 10
