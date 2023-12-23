@@ -1,23 +1,17 @@
 package user
 
-import "context"
+import (
+	"context"
+)
 
 type (
-	// Usecase . . .
-	Usecase interface {
-		Register(ctx context.Context, user *User) error
-		GetProfile(ctx context.Context, id int)
+	Service interface {
+		Register(ctx context.Context, body RequestRegister) error
+		GetProfile(ctx context.Context, id string) (*User, error)
 	}
 
-	// Repository . . .
 	Repository interface {
-		// FindByName . . .
-		FindByName(ctx context.Context, name string) (*User, error)
-
-		// FindByID . . .
-		FindByID(ctx context.Context, id int) (*User, error)
-
-		// CreateUser . . .
-		CreateUser(ctx context.Context) error
+		FindByID(ctx context.Context, id string) (*User, error)
+		CreateUser(ctx context.Context, user *User) (string, error)
 	}
 )

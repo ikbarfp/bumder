@@ -9,39 +9,64 @@ import (
 
 // HttpHandler . . .
 type HttpHandler struct {
+	userService user.Service
 }
 
-// NewHttpHandler . . .
-func NewHttpHandler() *HttpHandler {
-	return &HttpHandler{}
+// NewHttp . . .
+func NewHttp(userSvc user.Service) *HttpHandler {
+	return &HttpHandler{userService: userSvc}
 }
 
 // Register . . .
-func (h *HttpHandler) Register(w http.ResponseWriter, req *http.Request) {
+func (h HttpHandler) Register(w http.ResponseWriter, req *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	res := response.HttpResponse{}
 
-	res := response.HttpResponse{
-		Message: "success sign up",
+	var body user.RequestRegister
+	if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+		res.Message = "failed to decode request"
+		res.Errors = err.Error()
+		byteRes, _ := json.Marshal(res)
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write(byteRes)
+
+		return
 	}
 
+	if err := h.userService.Register(req.Context(), body); err != nil {
+		res.Message = "bad request"
+		res.Errors = err.Error()
+		byteRes, _ := json.Marshal(res)
+
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write(byteRes)
+
+		return
+	}
+
+	res.Message = "success register new user"
 	byteRes, _ := json.Marshal(res)
-	w.Header().Add("Content-Type", "application/json")
+
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(byteRes)
+
+	return
 }
 
 // Profile . . .
-func (h *HttpHandler) Profile(w http.ResponseWriter, req *http.Request) {
+func (h HttpHandler) Profile(w http.ResponseWriter, req *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
 
 	res := response.HttpResponse{
+		Message: "success get profile",
 		Data: &user.User{
-			Name:        "Kylian Mbappe",
-			MobilePhone: "+6286969696969",
-			IsPremium:   true,
+			Name:      "Kylian Mbappe",
+			IsPremium: true,
 		},
 	}
 
 	byteRes, _ := json.Marshal(res)
-	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(byteRes)
 }
