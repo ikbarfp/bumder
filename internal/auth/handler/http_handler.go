@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/ikbarfp/bumder/internal/auth"
 	"github.com/ikbarfp/bumder/pkg/response"
 	"net/http"
@@ -35,11 +36,18 @@ func (h *HttpHandler) Login(w http.ResponseWriter, req *http.Request) {
 
 	userAuth, err := h.authService.Login(req.Context(), body)
 	if err != nil {
-		res.Message = "bad request"
-		res.Errors = err.Error()
+		res.Message = err.Error()
+		res.Errors = "bad request"
 		byteRes, _ := json.Marshal(res)
 
-		w.WriteHeader(http.StatusBadRequest)
+		switch {
+		case errors.Is(err, response.ErrUserNotFound):
+			w.WriteHeader(http.StatusNotFound)
+		case errors.Is(err, response.ErrInvalidPin):
+			w.WriteHeader(http.StatusBadRequest)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 		_, _ = w.Write(byteRes)
 
 		return
