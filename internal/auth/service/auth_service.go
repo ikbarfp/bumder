@@ -11,7 +11,7 @@ type authService struct {
 
 // New . . .
 func New(authRepo auth.Repository) auth.Service {
-	return &authService{}
+	return &authService{authRepository: authRepo}
 }
 
 // Login . . .
