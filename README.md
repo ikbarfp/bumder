@@ -7,8 +7,9 @@ similar to *Bumble* and *Tinder*.
  So I'll just give my best to fulfill the requirements.
 
 ## *How To Run Project*
-> **Make sure you already prepare the ***config.yml*** file. 
-> You can see the config structure example from ***config.yml.example*** file**
+> [!IMPORTANT]  
+  Make sure you already prepare the ***config.yml*** file.  
+  You can see the config structure example from ***config.yml.example*** file
 
 ### Run the application
 ```bash
