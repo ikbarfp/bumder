@@ -49,26 +49,46 @@ func (h HttpHandler) Unseen(w http.ResponseWriter, req *http.Request) {
 
 // Like . . .
 func (h HttpHandler) Like(w http.ResponseWriter, req *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	res := response.HttpResponse{}
 
-	res := response.HttpResponse{
-		Message: "success to liked user",
+	if err := h.feedsService.SwipeRight(req.Context(), "", ""); err != nil {
+		res.Message = err.Error()
+		res.Errors = "bad request"
+		byteRes, _ := json.Marshal(res)
+
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write(byteRes)
+
+		return
 	}
 
+	res.Message = "success to liked user"
 	byteRes, _ := json.Marshal(res)
-	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(byteRes)
+
+	return
 }
 
 // Pass . . .
 func (h HttpHandler) Pass(w http.ResponseWriter, req *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	res := response.HttpResponse{}
 
-	res := response.HttpResponse{
-		Message: "success to pass user",
+	if err := h.feedsService.SwipeLeft(req.Context(), "", ""); err != nil {
+		res.Message = err.Error()
+		res.Errors = "bad request"
+		byteRes, _ := json.Marshal(res)
+
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write(byteRes)
+
+		return
 	}
 
+	res.Message = "success to pass user"
 	byteRes, _ := json.Marshal(res)
-	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(byteRes)
 }
