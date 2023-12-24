@@ -2,7 +2,7 @@
 A mini-project for creating dating apps backend system, 
 similar to *Bumble* and *Tinder*.
 
-> :warning: **Warning**  
+> [!WARNING]  
  My apology, this project actually is still under development, but I got limited times due to the deadline.   
  So I'll just give my best to fulfill the requirements.
 
