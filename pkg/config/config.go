@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 )
 
@@ -23,7 +22,8 @@ var (
 	}
 )
 
-// New . . .
+// New constructor for creating new config. It returns interface Configurator,
+// so it will contain all of its signature method
 func New(opts ...OptionFunc) Configurator {
 	cfg := defaultOptions
 
@@ -34,38 +34,37 @@ func New(opts ...OptionFunc) Configurator {
 	return &ViperConfig{config: cfg, viperCfg: viper.New()}
 }
 
-// GetString . . .
+// GetString return string with . (period) delimiter if your config had nested object like viper-style
 func GetString(name string) string {
 	return viperConf.getString(name)
 }
 
-// GetStrings . . .
+// GetStrings return string slices with . (period) delimiter if your config had nested object like viper-style
 func GetStrings(name string) []string {
 	return viperConf.getStrings(name)
 }
 
-// GetInt . . .
+// GetInt return int with . (period) delimiter if your config had nested object like viper-style
 func GetInt(name string) int {
-	fmt.Println("[limit.daily_credit] :", name)
 	return viperConf.getInt(name)
 }
 
-// GetInts . . .
+// GetInts return int slices with . (period) delimiter if your config had nested object like viper-style
 func GetInts(name string) []int {
 	return viperConf.getInts(name)
 }
 
-// GetInt32 . . .
+// GetInt32 return int32 with . (period) delimiter if your config had nested object like viper-style
 func GetInt32(name string) int32 {
 	return viperConf.getInt32(name)
 }
 
-// GetFloat64 . . .
+// GetFloat64 return float64 with . (period) delimiter if your config had nested object like viper-style
 func GetFloat64(name string) float64 {
 	return viperConf.getFloat64(name)
 }
 
-// GetBool . . .
+// GetBool return boolean with . (period) delimiter if your config had nested object like viper-style
 func GetBool(name string) bool {
 	return viperConf.getBool(name)
 }
