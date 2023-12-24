@@ -20,9 +20,9 @@ func New(userRepo user.Repository, authRepo auth.Repository) user.Service {
 func (s userService) Register(ctx context.Context, body user.RequestRegister) error {
 
 	newUser := &user.User{
-		Name:        body.FullName,
-		IsPremium:   false,
-		DateOfBirth: body.DateOfBirth,
+		Name:               body.FullName,
+		IsPremium:          false,
+		DailyActionCounter: 0,
 	}
 
 	userID, err := s.userRepository.CreateUser(ctx, newUser)
@@ -44,9 +44,9 @@ func (s userService) Register(ctx context.Context, body user.RequestRegister) er
 }
 
 // GetProfile . . .
-func (s userService) GetProfile(ctx context.Context, id string) (*user.User, error) {
+func (s userService) GetProfile(ctx context.Context, userID string) (*user.User, error) {
 
-	usr, err := s.userRepository.FindByID(ctx, id)
+	usr, err := s.userRepository.FindByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

@@ -4,13 +4,8 @@ import "context"
 
 type (
 	Service interface {
-		Unseen(ctx context.Context) ([]*UnseenUser, error)
-		SwipeRight(ctx context.Context, userID int, likedUserID int) error
-		SwipeLeft(ctx context.Context, userID int, dislikedUserID int) error
-	}
-
-	Repository interface {
-		IncrementLikeByUserID(ctx context.Context, userID int, likedUserID int) error
-		IncrementPassByUserID(ctx context.Context, userID int, dislikedUserID int) error
+		Unseen(ctx context.Context, userID string) ([]*UnseenUser, error)
+		SwipeRight(ctx context.Context, userID string, likedUserID string) error
+		SwipeLeft(ctx context.Context, userID string, dislikedUserID string) error
 	}
 )

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/ikbarfp/bumder/internal/feeds"
 	"github.com/ikbarfp/bumder/pkg/response"
 	"net/http"
@@ -22,7 +23,10 @@ func (h HttpHandler) Unseen(w http.ResponseWriter, req *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	res := response.HttpResponse{}
 
-	unseenUsers, err := h.feedsService.Unseen(req.Context())
+	pathParams := mux.Vars(req)
+	userID := pathParams["user_id"]
+
+	unseenUsers, err := h.feedsService.Unseen(req.Context(), userID)
 	if err != nil {
 		res.Message = err.Error()
 		res.Errors = "bad request"

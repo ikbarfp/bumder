@@ -1,6 +1,9 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+	"github.com/spf13/viper"
+)
 
 type Configurator interface {
 	Load() error
@@ -43,6 +46,7 @@ func GetStrings(name string) []string {
 
 // GetInt . . .
 func GetInt(name string) int {
+	fmt.Println("[limit.daily_credit] :", name)
 	return viperConf.getInt(name)
 }
 

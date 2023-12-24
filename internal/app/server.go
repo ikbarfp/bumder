@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/ikbarfp/bumder/pkg/config"
 	"log"
@@ -15,7 +16,8 @@ import (
 
 // Server . . .
 type Server struct {
-	router *mux.Router
+	validator *validator.Validate
+	router    *mux.Router
 }
 
 // New . . .
@@ -35,6 +37,8 @@ func New() *Server {
 	server := &Server{
 		router: mux.NewRouter(),
 	}
+
+	server.initValidator()
 	server.initRoutes()
 
 	return server

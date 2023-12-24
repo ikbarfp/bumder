@@ -6,12 +6,15 @@ import (
 	"github.com/google/uuid"
 	"github.com/ikbarfp/bumder/internal/user"
 	"github.com/ikbarfp/bumder/pkg/response"
-	"time"
 )
 
 var (
-	numOfRandomUser = 15
-	userData        []*user.User
+	numOfRandomUser = 30
+
+	// From here its just in-memory datastore for simulation
+	userData       []*user.User
+	likedUserData  []user.ActionUser
+	passedUserData []user.ActionUser
 )
 
 type userRepository struct {
@@ -25,15 +28,29 @@ func New() user.Repository {
 }
 
 func populateUser(qty int) {
-	for i := 1; i <= qty; i++ {
-		loc, _ := time.LoadLocation("Asia/Jakarta")
-		userData = append(userData, &user.User{
-			ID:          uuid.NewString(),
-			Name:        faker.Name(),
-			IsPremium:   false,
-			DateOfBirth: time.Date(1990+i, time.January, 1+i, 0, 0, 0, 0, loc),
-		})
+	for i := 0; i < qty; i++ {
+		usr := &user.User{
+			ID:        uuid.NewString(),
+			Name:      faker.Name(),
+			IsPremium: false,
+		}
+		userData = append(userData, usr)
+
+		populateInitialLikes(usr.ID)
+		populateInitialPasses(usr.ID)
 	}
+}
+
+func populateInitialLikes(userID string) {
+	initialLikes := make(user.ActionUser)
+	initialLikes[userID] = []string{}
+	likedUserData = append(likedUserData, initialLikes)
+}
+
+func populateInitialPasses(userID string) {
+	initialPasses := make(user.ActionUser)
+	initialPasses[userID] = []string{}
+	passedUserData = append(passedUserData, initialPasses)
 }
 
 // FindByID . . .
@@ -48,10 +65,95 @@ func (r userRepository) FindByID(ctx context.Context, id string) (*user.User, er
 	return nil, response.ErrUserNotFound
 }
 
+// FindLikedUserByID . . .
+func (r userRepository) FindLikedUserByID(ctx context.Context, userID string) ([]*user.User, error) {
+
+	var (
+		res          []*user.User
+		likedUserIDs []string
+	)
+
+	for _, likedUser := range likedUserData {
+		values, exists := likedUser[userID]
+		if exists {
+			likedUserIDs = values
+			break
+		}
+	}
+
+	if len(likedUserIDs) == 0 {
+		return nil, response.ErrDataNotFound
+	}
+
+	for _, likedUserID := range likedUserIDs {
+		for _, usrData := range userData {
+			if usrData.ID == likedUserID {
+				res = append(res, usrData)
+			}
+		}
+	}
+
+	return res, nil
+}
+
+// FindPassedUserByID . . .
+func (r userRepository) FindPassedUserByID(ctx context.Context, userID string) ([]*user.User, error) {
+
+	var (
+		res           []*user.User
+		passedUserIDs []string
+	)
+
+	for _, passedUser := range passedUserData {
+		values, exists := passedUser[userID]
+		if exists {
+			passedUserIDs = values
+			break
+		}
+	}
+
+	if len(passedUserIDs) == 0 {
+		return nil, response.ErrDataNotFound
+	}
+
+	for _, passedUserID := range passedUserIDs {
+		for _, usrData := range userData {
+			if usrData.ID == passedUserID {
+				res = append(res, usrData)
+			}
+		}
+	}
+
+	return res, nil
+}
+
+// FindActionCounterByID . . .
+func (r userRepository) FindActionCounterByID(ctx context.Context, userID string) (int8, error) {
+
+	for _, usr := range userData {
+		if usr.ID == userID {
+			return usr.DailyActionCounter, nil
+		}
+	}
+
+	return 0, response.ErrUserNotFound
+}
+
+// FindAllUser . . .
+func (r userRepository) FindAllUser(ctx context.Context) ([]*user.User, error) {
+
+	return userData, nil
+}
+
 // CreateUser . . .
 func (r userRepository) CreateUser(ctx context.Context, user *user.User) (string, error) {
-	user.ID = uuid.NewString()
+	userID := uuid.NewString()
+
+	user.ID = userID
 	userData = append(userData, user)
 
-	return user.ID, nil
+	populateInitialPasses(userID)
+	populateInitialLikes(userID)
+
+	return userID, nil
 }

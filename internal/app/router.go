@@ -2,11 +2,11 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/go-playground/validator/v10"
 	_authHandler "github.com/ikbarfp/bumder/internal/auth/handler"
 	_authRepo "github.com/ikbarfp/bumder/internal/auth/repository"
 	_authService "github.com/ikbarfp/bumder/internal/auth/service"
 	_feedsHandler "github.com/ikbarfp/bumder/internal/feeds/handler"
-	_feedsRepo "github.com/ikbarfp/bumder/internal/feeds/repository"
 	_feedsService "github.com/ikbarfp/bumder/internal/feeds/service"
 	_userHandler "github.com/ikbarfp/bumder/internal/user/handler"
 	_userRepo "github.com/ikbarfp/bumder/internal/user/repository"
@@ -14,6 +14,10 @@ import (
 	"github.com/ikbarfp/bumder/pkg/response"
 	"net/http"
 )
+
+func (s *Server) initValidator() {
+	s.validator = validator.New()
+}
 
 func (s *Server) initRoutes() {
 	s.router.Path("/").HandlerFunc(s.healthcheckHandler)
@@ -30,18 +34,17 @@ func (s *Server) initRoutes() {
 
 	userRepo := _userRepo.New()
 	userService := _userService.New(userRepo, authRepo)
-	userHandler := _userHandler.NewHttp(userService)
+	userHandler := _userHandler.NewHttp(s.validator, userService)
 
 	userV1 := apiV1.PathPrefix("/user").Subrouter()
 	userV1.Methods(http.MethodPost).Path("/register").HandlerFunc(userHandler.Register)
-	userV1.Methods(http.MethodGet).Path("/profile").HandlerFunc(userHandler.Profile)
+	userV1.Methods(http.MethodGet).Path("/profile/{user_id}").HandlerFunc(userHandler.Profile)
 
-	feedsRepo := _feedsRepo.New()
-	feedsService := _feedsService.New(feedsRepo)
+	feedsService := _feedsService.New(userRepo)
 	feedsHandler := _feedsHandler.NewHttp(feedsService)
 
 	feedsV1 := apiV1.PathPrefix("/feeds").Subrouter()
-	feedsV1.Methods(http.MethodGet).Path("/unseen").HandlerFunc(feedsHandler.Unseen)
+	feedsV1.Methods(http.MethodGet).Path("/unseen/{user_id}").HandlerFunc(feedsHandler.Unseen)
 	feedsV1.Methods(http.MethodPost).Path("/like").HandlerFunc(feedsHandler.Like)
 	feedsV1.Methods(http.MethodPost).Path("/pass").HandlerFunc(feedsHandler.Pass)
 }
