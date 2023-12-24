@@ -3,6 +3,8 @@ package app
 import (
 	"encoding/json"
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
+	"github.com/ikbarfp/bumder/internal/app/middleware"
 	_authHandler "github.com/ikbarfp/bumder/internal/auth/handler"
 	_authRepo "github.com/ikbarfp/bumder/internal/auth/repository"
 	_authService "github.com/ikbarfp/bumder/internal/auth/service"
@@ -20,6 +22,8 @@ func (s *Server) initValidator() {
 }
 
 func (s *Server) initRoutes() {
+	s.router.Use(middleware.RequestID, mux.CORSMethodMiddleware(s.router))
+
 	s.router.Path("/").HandlerFunc(s.healthcheckHandler)
 	s.router.Methods(http.MethodGet).Path("/healthcheck").HandlerFunc(s.healthcheckHandler)
 
