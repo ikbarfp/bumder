@@ -1,4 +1,5 @@
 server_app:
-  host: ""
-  port: ""
-  version: ""
+  name: "BUMDER"
+  host: "{YOUR_SERVER_HOST}"
+  port: "{YOUR_SERVER_PORT}"
+  version: "{YOUR_SERVER_VERSION}"
